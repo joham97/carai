@@ -23,7 +23,6 @@ public class Car {
 	private float fitness = 0;
 
 	private float maxSpeed = 500;
-	private float maxTurn = 3;
 
 	private int sensorWidth = 10;
 
@@ -49,7 +48,7 @@ public class Car {
 
 	public void update(float delta) {
 		if (!this.dead) {
-			this.rotation += this.turn * delta * this.maxTurn;
+			this.rotation += this.turn * delta;
 
 			this.x += delta * this.engine * this.maxSpeed * Math.cos(this.rotation);
 			this.y += delta * this.engine * this.maxSpeed * Math.sin(this.rotation);
@@ -133,6 +132,10 @@ public class Car {
 		return c;
 	}
 
+	public float getSensorValue(int i) {
+		return this.sensors.get(i).getDist();
+	}
+	
 	public float getX() {
 		return this.x;
 	}
@@ -142,7 +145,7 @@ public class Car {
 	}
 
 	public void setTurn(float turn) {
-		this.turn = turn;
+		this.turn = 2f*turn-1f;
 	}
 
 	public void setEngine(float engine) {
@@ -169,5 +172,9 @@ public class Car {
 
 	public float getTurn() {
 		return this.turn;
+	}
+	
+	public boolean isDead() {
+		return dead;
 	}
 }

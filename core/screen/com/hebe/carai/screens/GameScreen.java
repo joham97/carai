@@ -3,6 +3,7 @@ package com.hebe.carai.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -43,7 +44,13 @@ public class GameScreen implements Screen{
 	}
 
 	private void update(float delta) {
-		this.world.update(delta);
+		if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+			this.world.update(delta);
+		}else {
+			for(int i = 0; i < 10; i++) {
+				this.world.update(delta);
+			}
+		}
 	}
 
 	@Override

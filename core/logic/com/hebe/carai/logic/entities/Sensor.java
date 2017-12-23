@@ -10,7 +10,7 @@ import com.hebe.gameutils.collision.MyVector;
 
 public class Sensor {
 	
-	private float x, y, endX, endY;
+	private float x, y, endX, endY, dist;
 	
 	public void set(float x, float y, float cX, float cY, List<Wall> walls) {
 		this.x = x;
@@ -18,18 +18,18 @@ public class Sensor {
 		MyVector dir = new MyVector(x - cX, y - cY).unit();
 		MyLine line = new MyLine(x, y, x + dir.x * 2000, y + dir.y * 2000);
 		
-		float minDist = 2000;
+		this.dist = 2000;
 		for(Wall wall : walls){
 			MyVector vec = wall.collides(line);
 			if(vec != null){
 				float dst = vec.dst(new MyVector(x, y));
-				if(dst < minDist){
-					minDist = dst;
+				if(dst < this.dist){
+					this.dist = dst;
 				}
 			}
 		}
 		
-		MyVector end = new MyVector(x, y).add(dir.scl(minDist));
+		MyVector end = new MyVector(x, y).add(dir.scl(this.dist));
 		this.endX = end.x;
 		this.endY = end.y;
 	}
@@ -48,5 +48,9 @@ public class Sensor {
 		shape.circle(this.endX, this.endY, 5);
 		
 		shape.end();
+	}
+	
+	public float getDist() {
+		return dist;
 	}
 }

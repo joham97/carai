@@ -79,8 +79,8 @@ public class NeuralLayer {
 		}
 		biasedInputs[inputs.length] = 1.0;
 
-		for (int j = 0; j < this.weights.length; j++)
-			for (int i = 0; i < this.weights[j].length; i++)
+		for (int i = 0; i < this.weights.length; i++)
+			for (int j = 0; j < this.weights[j].length; j++)
 				sums[j] += biasedInputs[i] * this.weights[i][j];
 
 		for (int i = 0; i < sums.length; i++)
@@ -139,7 +139,20 @@ public class NeuralLayer {
 	}
 
 	public double sigmoid(double value) {
-		return (1 / (1 + Math.pow(Math.E, (-1 * value))));
+		if (value > 10) return 1.0;
+        else if (value < -10) return 0.0;
+        else return 1.0 / (1.0 + Math.exp(-value));
 	}
-
+	
+	public void mutate(float value) {
+		for (int i = 0; i < this.weights.length; i++) {
+			for (int j = 0; j < this.weights[i].length; j++) {
+				if(randomizer.nextDouble() < this.weights[i][j]) {
+					this.weights[i][j] += Math.max(this.weights[i][j] - value, 0) * randomizer.nextDouble();
+				}else {
+					this.weights[i][j] += Math.min(this.weights[i][j] + value, 1) * randomizer.nextDouble();
+				}
+			}
+		}
+	}
 }
