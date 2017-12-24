@@ -2,6 +2,7 @@ package com.hebe.carai.hud.components;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public abstract class HUDComponent {
 
@@ -13,7 +14,7 @@ public abstract class HUDComponent {
 		this.y = y;
 	}
 	
-	public abstract void draw(SpriteBatch batch, BitmapFont font);
+	public abstract void draw(SpriteBatch batch, ShapeRenderer shape, BitmapFont font);
 	
 	public int getX() {
 		return this.x;

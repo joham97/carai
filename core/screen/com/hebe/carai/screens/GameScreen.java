@@ -79,11 +79,7 @@ public class GameScreen implements Screen{
 		this.game.getSpriteBatch().setProjectionMatrix(this.hudViewport.getCamera().combined);
 		this.game.getShapeRenderer().setProjectionMatrix(this.hudViewport.getCamera().combined);
 
-		this.game.getSpriteBatch().begin();	
-		
-		this.hud.draw(this.game.getSpriteBatch(), this.game.getFont());
-		
-		this.game.getSpriteBatch().end();
+		this.hud.draw(this.game.getSpriteBatch(), this.game.getShapeRenderer(), this.game.getFont());
 		
 		Gdx.gl.glDisable(GL20.GL_BLEND);
 

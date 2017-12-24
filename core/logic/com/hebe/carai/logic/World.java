@@ -20,6 +20,7 @@ import com.hebe.carai.hud.components.HUDText;
 import com.hebe.carai.logic.entities.Car;
 import com.hebe.carai.logic.entities.Wall;
 import com.hebe.carai.logic.nn.Genom;
+import com.hebe.carai.logic.nn.NNComponent;
 import com.hebe.carai.logic.nn.NeuralNetwork;
 
 public class World {
@@ -33,6 +34,7 @@ public class World {
 	private HUDText engine;
 	private HUDText fitness;
 	private HUDText generation;
+	private NNComponent nnComponent;
 
 	private int count = 512;
 
@@ -45,11 +47,14 @@ public class World {
 		this.engine = new HUDText(0, 1060, "Engine: ");
 		this.fitness = new HUDText(0, 1040, "Fitness: ");
 		this.generation = new HUDText(0, 1020, "Generation: ");
+		
+		this.nnComponent = new NNComponent(0, 0);
 
 		hud.add(this.turn);
 		hud.add(this.engine);
 		hud.add(this.fitness);
 		hud.add(this.generation);
+		hud.add(this.nnComponent);
 
 		this.camX = 0;
 		this.camY = 0;
@@ -127,6 +132,9 @@ public class World {
 			}else {
 				this.generation.setText("Generation: " + this.generationCount + " from " + maxGenom2.getInitalGeneration());
 			}
+			
+			this.nnComponent.setNn(maxGenom.getNeuralNetwork());
+			
 			if(Gdx.input.isKeyJustPressed(Keys.P)) {
 				exportNN(maxGenom2);
 			}
@@ -172,7 +180,7 @@ public class World {
 			genom.getCar().render(shape);
 		}
 	}
-
+	
 	private void importNN() {
 		try {
 			FileHandle file = Gdx.files.local("nn.dat");

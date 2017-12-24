@@ -21,7 +21,7 @@ public class NeuralLayer implements Serializable{
 
 		this.weights = new double[nodeCount + 1][outputCount]; // + 1 for bias node
 	}
-
+	
 	public void setWeights(double[] weights) {
 		// Check arguments
 		if (weights.length != this.weights.length)
@@ -49,7 +49,7 @@ public class NeuralLayer implements Serializable{
 		biasedInputs[inputs.length] = 1.0;
 
 		for (int i = 0; i < this.weights.length; i++)
-			for (int j = 0; j < this.weights[j].length; j++)
+			for (int j = 0; j < this.weights[i].length; j++)
 				sums[j] += biasedInputs[i] * this.weights[i][j];
 
 		for (int i = 0; i < sums.length; i++)

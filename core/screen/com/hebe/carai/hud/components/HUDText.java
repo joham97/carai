@@ -2,6 +2,7 @@ package com.hebe.carai.hud.components;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class HUDText extends HUDComponent{
 	
@@ -13,8 +14,10 @@ public class HUDText extends HUDComponent{
 	}
 	
 	@Override
-	public void draw(SpriteBatch batch, BitmapFont font) {
+	public void draw(SpriteBatch batch, ShapeRenderer shape, BitmapFont font) {
+		batch.begin();
 		font.draw(batch, this.text, this.x, this.y);
+		batch.end();
 	}
 	
 	public String getText() {
