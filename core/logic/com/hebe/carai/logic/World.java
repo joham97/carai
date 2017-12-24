@@ -180,6 +180,8 @@ public class World {
 			NeuralNetwork imported = (NeuralNetwork) ois.readObject();
 			ois.close();
 			
+			this.generationCount = 1;
+			
 			Genom genom = new Genom(new Car(0, 0, 120, 80, this.walls), imported);
 			genom.setInitalGeneration(1);
 
