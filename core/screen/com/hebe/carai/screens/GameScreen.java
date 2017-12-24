@@ -44,7 +44,7 @@ public class GameScreen implements Screen{
 	}
 
 	private void update(float delta) {
-		if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+		if(!Gdx.input.isKeyPressed(Keys.SPACE)) {
 			this.world.update(delta);
 		}else {
 			for(int i = 0; i < 10; i++) {

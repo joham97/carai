@@ -6,6 +6,7 @@ public class Genom {
 
 	private Car car;
 	private NeuralNetwork neuralNetwork;
+	private int initalGeneration = -1;
 	
 	public Genom(Car car) {
 		this.car = car;
@@ -36,6 +37,14 @@ public class Genom {
 	
 	public NeuralNetwork getNeuralNetwork() {
 		return neuralNetwork;
+	}
+	
+	public void setInitalGeneration(int initalGeneration) {
+		this.initalGeneration = initalGeneration;
+	}
+	
+	public int getInitalGeneration() {
+		return initalGeneration;
 	}
 	
 }

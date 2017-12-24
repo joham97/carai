@@ -1,10 +1,20 @@
 package com.hebe.carai.logic;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import org.omg.PortableServer.ImplicitActivationPolicyOperations;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.hebe.carai.hud.HUD;
@@ -26,7 +36,7 @@ public class World {
 	private HUDText fitness;
 	private HUDText generation;
 
-	private int count = 128;
+	private int count = 512;
 
 	private boolean out = false;
 
@@ -48,20 +58,26 @@ public class World {
 
 		this.walls = new ArrayList<Wall>();
 
-		for (int i = 0; i < 512; i++) {
-			this.walls.add(new Wall(250f * i, 500f * (float) Math.sin((i / 4f) * Math.PI) - 350f,
-									250f * (i + 1), 500f * (float) Math.sin(((i + 1) / 4f) * Math.PI) - 350f));
-			this.walls.add(new Wall(250f * i, 500f * (float) Math.sin((i / 4f) * Math.PI) + 350f,
-					250f * (i + 1), 500f * (float) Math.sin(((i + 1) / 4f) * Math.PI) + 350f));
+		int y = 0;
+		int variation = 250;
+		Random rand = new Random();
+		for (int i = 0; i < this.count; i++) {
+			int nY = (int) (y + rand.nextDouble() * (2*variation) - variation);
+			this.walls.add(new Wall(250f * i, y - 250f, 250f * (i + 1), nY - 250f));
+			this.walls.add(new Wall(250f * i, y + 250f, 250f * (i + 1), nY + 250f));
+			y = nY;
 		}
 
-		this.walls.add(new Wall(-350f, 350f, 0f, 350f));
-		this.walls.add(new Wall(-350f, -350f, 0f, -350f));
-		this.walls.add(new Wall(-350f, 350f, -350f, -350f));
+		this.walls.add(new Wall(-250f, 250f, 0f, 250f));
+		this.walls.add(new Wall(-250f, -250f, 0f, -250f));
+		this.walls.add(new Wall(-250f, 250f, -250f, -250f));
+		this.walls.add(new Wall(250f * this.count, y+250f, 250f * this.count, y-250f));
 
 		this.genoms = new ArrayList<Genom>();
 		for (int i = 0; i < 20; i++) {
-			this.genoms.add(new Genom(new Car(0, 0, 120, 80, this.walls)));
+			Genom genom = new Genom(new Car(0, 0, 120, 80, this.walls));
+			genom.setInitalGeneration(generationCount);
+			this.genoms.add(genom);
 		}
 	}
 
@@ -94,8 +110,8 @@ public class World {
 			}
 		}
 		if (allDead && !out) {
-			nextGen(maxGenom);
 			this.generationCount++;
+			nextGen(maxGenom);
 		}
 
 		if (maxGenom2 != null) {
@@ -104,26 +120,42 @@ public class World {
 			this.turn.setText("Turn: " + maxGenom2.getCar().getTurn());
 			this.engine.setText("Engine: " + maxGenom2.getCar().getEngine());
 			this.fitness.setText("Fitness: " + maxGenom2.getCar().getFitness());
-			this.generation.setText("Generation: " + generationCount);
+			if(generationCount == maxGenom2.getInitalGeneration()) {
+				this.generation.setText("Generation: " + generationCount);
+			}else {
+				this.generation.setText("Generation: " + generationCount + " from " + maxGenom2.getInitalGeneration());
+			}
+			if(Gdx.input.isKeyJustPressed(Keys.P)) {
+				exportNN(maxGenom2);
+			}
 		}
 
+		if(Gdx.input.isKeyJustPressed(Keys.I)) {
+			importNN();
+		}
 	}
 
 	private void nextGen(Genom genom) {
 		this.genoms.clear();
-		this.genoms.add(new Genom(new Car(0, 0, 120, 80, this.walls), genom.getNeuralNetwork()));
+		Genom bestNeuralNetwork = new Genom(new Car(0, 0, 120, 80, this.walls), genom.getNeuralNetwork());
+		bestNeuralNetwork.setInitalGeneration(genom.getInitalGeneration());
+		this.genoms.add(bestNeuralNetwork);
 		for (int i = 0; i < 9; i++) {
 			NeuralNetwork bestNetwork = genom.getNeuralNetwork().deepCopy();
 			bestNetwork.mutate(1 - genom.getCar().getFitness());
-			this.genoms.add(new Genom(new Car(0, 0, 120, 80, this.walls), bestNetwork));
+			Genom newGenom = new Genom(new Car(0, 0, 120, 80, this.walls), bestNetwork);
+			newGenom.setInitalGeneration(generationCount);
+			this.genoms.add(newGenom);
 		}
 		for (int i = 9; i < 20; i++) {
-			this.genoms.add(new Genom(new Car(0, 0, 120, 80, this.walls)));
+			Genom newGenom = new Genom(new Car(0, 0, 120, 80, this.walls));
+			newGenom.setInitalGeneration(generationCount);
+			this.genoms.add(newGenom);
 		}
 	}
 
 	private void calcFitness(Car car) {
-		car.setFitness(car.getX() / (this.count * 500));
+		car.setFitness(car.getX() / (this.count * 250));
 	}
 
 	public void render(SpriteBatch batch, ShapeRenderer shape) {
@@ -136,6 +168,40 @@ public class World {
 		}
 	}
 
+	private void importNN() {
+		try {
+			FileHandle file = Gdx.files.local("nn.dat");
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file.file()));
+			NeuralNetwork imported = (NeuralNetwork) ois.readObject();
+			ois.close();
+			
+			Genom genom = new Genom(new Car(0, 0, 120, 80, this.walls), imported);
+			genom.setInitalGeneration(1);
+
+			this.genoms.clear();
+			this.genoms.add(genom);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void exportNN(Genom genom) {
+		try {
+			FileHandle file = Gdx.files.local("nn.dat");
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file.file()));
+			oos.writeObject(genom.getNeuralNetwork());
+			oos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void setCam(float x, float y) {
 		this.camX = x;
 		this.camY = y;
