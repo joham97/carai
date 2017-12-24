@@ -54,6 +54,10 @@ public class World {
 		this.camX = 0;
 		this.camY = 0;
 
+		reset();
+	}
+	
+	public void reset(){
 		this.walls = new ArrayList<Wall>();
 
 		int y = 0;
@@ -74,7 +78,7 @@ public class World {
 		this.genoms = new ArrayList<Genom>();
 		for (int i = 0; i < 20; i++) {
 			Genom genom = new Genom(new Car(0, 0, 120, 80, this.walls));
-			genom.setInitalGeneration(generationCount);
+			genom.setInitalGeneration(this.generationCount);
 			this.genoms.add(genom);
 		}
 	}
@@ -107,7 +111,7 @@ public class World {
 				}
 			}
 		}
-		if (allDead && !out) {
+		if (allDead && !this.out) {
 			this.generationCount++;
 			nextGen(maxGenom);
 		}
@@ -118,10 +122,10 @@ public class World {
 			this.turn.setText("Turn: " + maxGenom2.getCar().getTurn());
 			this.engine.setText("Engine: " + maxGenom2.getCar().getEngine());
 			this.fitness.setText("Fitness: " + maxGenom2.getCar().getFitness());
-			if(generationCount == maxGenom2.getInitalGeneration()) {
-				this.generation.setText("Generation: " + generationCount);
+			if(this.generationCount == maxGenom2.getInitalGeneration()) {
+				this.generation.setText("Generation: " + this.generationCount);
 			}else {
-				this.generation.setText("Generation: " + generationCount + " from " + maxGenom2.getInitalGeneration());
+				this.generation.setText("Generation: " + this.generationCount + " from " + maxGenom2.getInitalGeneration());
 			}
 			if(Gdx.input.isKeyJustPressed(Keys.P)) {
 				exportNN(maxGenom2);
@@ -130,6 +134,9 @@ public class World {
 
 		if(Gdx.input.isKeyJustPressed(Keys.I)) {
 			importNN();
+		}
+		if(Gdx.input.isKeyJustPressed(Keys.R)) {
+			reset();
 		}
 	}
 
@@ -142,12 +149,12 @@ public class World {
 			NeuralNetwork bestNetwork = genom.getNeuralNetwork().deepCopy();
 			bestNetwork.mutate(1 - genom.getCar().getFitness());
 			Genom newGenom = new Genom(new Car(0, 0, 120, 80, this.walls), bestNetwork);
-			newGenom.setInitalGeneration(generationCount);
+			newGenom.setInitalGeneration(this.generationCount);
 			this.genoms.add(newGenom);
 		}
 		for (int i = 9; i < 20; i++) {
 			Genom newGenom = new Genom(new Car(0, 0, 120, 80, this.walls));
-			newGenom.setInitalGeneration(generationCount);
+			newGenom.setInitalGeneration(this.generationCount);
 			this.genoms.add(newGenom);
 		}
 	}

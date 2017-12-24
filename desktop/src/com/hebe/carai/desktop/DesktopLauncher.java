@@ -21,7 +21,7 @@ public class DesktopLauncher {
 		config.height = HEIGHT;
 		config.x = d.width / 2 - WIDTH / 2;
 		config.y = d.height / 2 - HEIGHT / 2;
-		config.fullscreen = false;
+		config.fullscreen = true;
 		config.vSyncEnabled = false; // Setting to false disables vertical sync
 		config.foregroundFPS = 0; // Setting to 0 disables foreground fps throttling
 		config.backgroundFPS = 0; // Setting to 0 disables background fps throttling
